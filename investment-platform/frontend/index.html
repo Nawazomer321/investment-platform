@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GoldPro Invest</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        gold: { 400: '#fbbf24', 500: '#f59e0b', 600: '#d97706' },
+        dark: { 900: '#0a0a0a', 800: '#111111', 700: '#1a1a1a', 600: '#222222', 500: '#2a2a2a', 400: '#333333' }
+      }
+    }
+  }
+}
+</script>
+<style>
+* { box-sizing: border-box; }
+body { background: #0a0a0a; color: #f1f5f9; font-family: 'Segoe UI', system-ui, sans-serif; }
+.gradient-gold { background: linear-gradient(135deg, #f59e0b, #d97706); }
+.gradient-card { background: linear-gradient(135deg, #1a1a1a, #111111); }
+.glow { box-shadow: 0 0 20px rgba(245,158,11,0.15); }
+.page { display: none; }
+.page.active { display: block; }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #111; }
+::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+input, select, textarea { background: #1a1a1a !important; border: 1px solid #333 !important; color: #f1f5f9 !important; border-radius: 8px; padding: 10px 14px; width: 100%; transition: border-color 0.2s; }
+input:focus, select:focus, textarea:focus { outline: none; border-color: #f59e0b !important; }
+.btn-gold { background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: 700; border-radius: 8px; padding: 12px 24px; cursor: pointer; transition: opacity 0.2s; border: none; }
+.btn-gold:hover { opacity: 0.9; }
+.btn-ghost { background: transparent; border: 1px solid #333; color: #f1f5f9; border-radius: 8px; padding: 10px 20px; cursor: pointer; transition: all 0.2s; }
+.btn-ghost:hover { border-color: #f59e0b; color: #f59e0b; }
+.card { background: #111111; border: 1px solid #222; border-radius: 12px; padding: 20px; }
+.stat-card { background: #111111; border: 1px solid #222; border-radius: 12px; padding: 20px; transition: border-color 0.2s; }
+.stat-card:hover { border-color: #f59e0b33; }
+.badge-success { background: #05140a; color: #4ade80; border: 1px solid #166534; font-size: 11px; padding: 3px 8px; border-radius: 20px; }
+.badge-pending { background: #171307; color: #fbbf24; border: 1px solid #713f12; font-size: 11px; padding: 3px 8px; border-radius: 20px; }
+.badge-rejected { background: #130707; color: #f87171; border: 1px solid #7f1d1d; font-size: 11px; padding: 3px 8px; border-radius: 20px; }
+.badge-active { background: #071317; color: #38bdf8; border: 1px solid #0c4a6e; font-size: 11px; padding: 3px 8px; border-radius: 20px; }
+.nav-link { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-radius: 8px; color: #94a3b8; cursor: pointer; transition: all 0.2s; font-size: 14px; }
+.nav-link:hover, .nav-link.active { background: #1a1a1a; color: #f59e0b; }
+.sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 240px; background: #0d0d0d; border-right: 1px solid #1a1a1a; z-index: 50; overflow-y: auto; transition: transform 0.3s; }
+.main-content { margin-left: 240px; min-height: 100vh; padding: 24px; }
+.topbar { position: sticky; top: 0; background: #0a0a0a; border-bottom: 1px solid #1a1a1a; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; z-index: 40; }
+.toast { position: fixed; top: 20px; right: 20px; z-index: 9999; padding: 14px 20px; border-radius: 10px; font-size: 14px; font-weight: 600; animation: slideIn 0.3s ease; max-width: 360px; }
+.toast.success { background: #052612; border: 1px solid #166534; color: #4ade80; }
+.toast.error { background: #130707; border: 1px solid #7f1d1d; color: #f87171; }
+.toast.info { background: #071317; border: 1px solid #0c4a6e; color: #38bdf8; }
+@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+.modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: center; justify-content: center; }
+.modal-bg.open { display: flex; }
+.modal-box { background: #111; border: 1px solid #333; border-radius: 16px; padding: 28px; width: 90%; max-width: 460px; max-height: 90vh; overflow-y: auto; }
+.progress-bar { background: #1a1a1a; border-radius: 999px; height: 6px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #f59e0b, #d97706); transition: width 0.5s; }
+table { width: 100%; border-collapse: collapse; }
+th { text-align: left; padding: 12px 16px; color: #64748b; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #1a1a1a; }
+td { padding: 14px 16px; border-bottom: 1px solid #111; font-size: 14px; color: #e2e8f0; }
+tr:hover td { background: #0d0d0d; }
+.auth-container { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; background: #0a0a0a; }
+.auth-card { background: #111; border: 1px solid #222; border-radius: 20px; padding: 40px; width: 100%; max-width: 440px; }
+@media (max-width: 768px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .main-content { margin-left: 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- ======== AUTH PAGES ======== -->
+<div id="auth-section">
+
+  <!-- LOGIN -->
+  <div id="login-page" class="auth-container">
+    <div class="auth-card">
+      <div class="text-center mb-8">
+        <div class="gradient-gold text-black font-bold text-2xl px-4 py-2 rounded-xl inline-block mb-3">💰 GoldPro</div>
+        <h1 class="text-2xl font-bold text-white">Welcome Back</h1>
+        <p class="text-slate-400 text-sm mt-1">Sign in to your investment account</p>
+      </div>
+      <div class="space-y-4">
+        <div>
+          <label class="text-sm text-slate-400 block mb-1">Email Address</label>
+          <input type="email" id="login-email" placeholder="you@example.com">
+        </div>
+        <div>
+          <label class="text-sm text-slate-400 block mb-1">Password</label>
+          <input type="password" id="login-password" placeholder="••••••••">
+        </div>
+        <button class="btn-gold w-full mt-2" onclick="handleLogin()">Sign In</button>
+      </div>
+      <p class="text-center text-slate-400 text-sm mt-6">
+        Don't have an account? <span class="text-gold-500 cursor-pointer hover:underline" onclick="showAuth('signup')">Create Account</span>
+      </p>
+    </div>
+  </div>
+
+  <!-- SIGNUP -->
+  <div id="signup-page" class="auth-container" style="display:none">
+    <div class="auth-card">
+      <div class="text-center mb-8">
+        <div class="gradient-gold text-black font-bold text-2xl px-4 py-2 rounded-xl inline-block mb-3">💰 GoldPro</div>
+        <h1 class="text-2xl font-bold text-white">Create Account</h1>
+        <p class="text-slate-400 text-sm mt-1">Start your investment journey today</p>
+      </div>
+      <div class="space-y-4">
+        <div class="grid grid-cols-1 gap-4">
+          <div>
+            <label class="text-sm text-slate-400 block mb-1">Full Name</label>
+            <input type="text" id="signup-name" placeholder="Muhammad Ali">
+          </div>
+          <div>
+            <label class="text-sm text-slate-400 block mb-1">Email Address</label>
+            <input type="email" id="signup-email" placeholder="you@example.com">
+          </div>
+          <div>
+            <label class="text-sm text-slate-400 block mb-1">Phone Number</label>
+            <input type="text" id="signup-phone" placeholder="03001234567">
+          </div>
+          <div>
+            <label class="text-sm text-slate-400 block mb-1">Password</label>
+            <input type="password" id="signup-password" placeholder="Min 8 characters">
+          </div>
+        </div>
+        <button class="btn-gold w-full" onclick="handleSignup()">Create Account</button>
+      </div>
+      <p class="text-center text-slate-400 text-sm mt-6">
+        Already have an account? <span class="text-gold-500 cursor-pointer hover:underline" onclick="showAuth('login')">Sign In</span>
+      </p>
+    </div>
+  </div>
+
+  <!-- OTP VERIFY -->
+  <div id="otp-page" class="auth-container" style="display:none">
+    <div class="auth-card text-center">
+      <div class="text-5xl mb-4">📧</div>
+      <h1 class="text-2xl font-bold text-white mb-2">Verify Email</h1>
+      <p class="text-slate-400 text-sm mb-6">We sent a 6-digit OTP to your email. Please check your inbox.</p>
+      <div class="mb-4">
+        <input type="text" id="otp-input" placeholder="Enter 6-digit OTP" maxlength="6" class="text-center text-2xl font-bold tracking-widest">
+      </div>
+      <button class="btn-gold w-full mb-3" onclick="handleVerifyOTP()">Verify OTP</button>
+      <button class="btn-ghost w-full text-sm" onclick="handleResendOTP()">Resend OTP</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======== MAIN APP ======== -->
+<div id="app-section" style="display:none">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar" id="sidebar">
+    <div class="p-5 border-b border-dark-600">
+      <div class="gradient-gold text-black font-bold text-lg px-3 py-1.5 rounded-lg inline-block">💰 GoldPro</div>
+      <p class="text-xs text-slate-500 mt-1">Investment Platform</p>
+    </div>
+    <div class="p-4" id="user-nav">
+      <p class="text-xs text-slate-600 uppercase tracking-widest font-semibold mb-3 px-2">Main Menu</p>
+      <nav class="space-y-1">
+        <div class="nav-link" onclick="showPage('dashboard')">📊 Dashboard</div>
+        <div class="nav-link" onclick="showPage('plans')">📈 Investment Plans</div>
+        <div class="nav-link" onclick="showPage('deposit')">💳 Deposit</div>
+        <div class="nav-link" onclick="showPage('withdraw')">💸 Withdraw</div>
+        <div class="nav-link" onclick="showPage('history')">📋 Transactions</div>
+      </nav>
+    </div>
+    <div class="p-4" id="admin-nav" style="display:none">
+      <p class="text-xs text-slate-600 uppercase tracking-widest font-semibold mb-3 px-2 mt-2">Admin Panel</p>
+      <nav class="space-y-1">
+        <div class="nav-link" onclick="showPage('admin-dashboard')">🏠 Overview</div>
+        <div class="nav-link" onclick="showPage('admin-users')">👥 Users</div>
+        <div class="nav-link" onclick="showPage('admin-approvals')">✅ Approvals</div>
+        <div class="nav-link" onclick="showPage('admin-plans')">📈 Manage Plans</div>
+        <div class="nav-link" onclick="showPage('admin-settings')">⚙️ Settings</div>
+      </nav>
+    </div>
+    <div class="p-4 border-t border-dark-600 mt-auto">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-9 h-9 rounded-full gradient-gold flex items-center justify-center text-black font-bold text-sm" id="user-avatar">A</div>
+        <div>
+          <p class="text-sm font-semibold text-white" id="sidebar-name">User</p>
+          <p class="text-xs text-slate-500" id="sidebar-role">Investor</p>
+        </div>
+      </div>
+      <button class="btn-ghost w-full text-sm" onclick="handleLogout()">🚪 Sign Out</button>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+    <div class="topbar">
+      <div class="flex items-center gap-3">
+        <button class="md:hidden text-white p-2" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+        <h2 class="text-lg font-semibold text-white" id="page-title">Dashboard</h2>
+      </div>
+      <div class="flex items-center gap-4">
+        <span class="text-sm text-gold-500 font-semibold">Balance: PKR <span id="topbar-balance">0</span></span>
+      </div>
+    </div>
+
+    <!-- ===== USER PAGES ===== -->
+
+    <!-- DASHBOARD -->
+    <div class="page" id="page-dashboard">
+      <div class="mb-6">
+        <h3 class="text-xl font-bold text-white mb-1">Welcome back, <span id="dash-name">User</span>! 👋</h3>
+        <p class="text-slate-400 text-sm">Here's your investment overview</p>
+      </div>
+
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="stat-card">
+          <p class="text-xs text-slate-500 mb-1">Total Balance</p>
+          <p class="text-2xl font-bold text-gold-500">PKR <span id="d-balance">0</span></p>
+          <p class="text-xs text-slate-600 mt-1">Available to invest</p>
+        </div>
+        <div class="stat-card">
+          <p class="text-xs text-slate-500 mb-1">Total Invested</p>
+          <p class="text-2xl font-bold text-blue-400">PKR <span id="d-invested">0</span></p>
+          <p class="text-xs text-slate-600 mt-1">In active plans</p>
+        </div>
+        <div class="stat-card">
+          <p class="text-xs text-slate-500 mb-1">Total Profit</p>
+          <p class="text-2xl font-bold text-green-400">PKR <span id="d-profit">0</span></p>
+          <p class="text-xs text-slate-600 mt-1">Earned so far</p>
+        </div>
+        <div class="stat-card">
+          <p class="text-xs text-slate-500 mb-1">Withdrawn</p>
+          <p class="text-2xl font-bold text-purple-400">PKR <span id="d-withdrawn">0</span></p>
+          <p class="text-xs text-slate-600 mt-1">Total withdrawn</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="card">
+          <h4 class="font-semibold text-white mb-4">Active Investments</h4>
+          <div id="active-investments-list">
+            <p class="text-slate-500 text-sm">No active investments.</p>
+          </div>
+        </div>
+        <div class="card">
+          <h4 class="font-semibold text-white mb-4">Recent Transactions</h4>
+          <div id="recent-txns-list">
+            <p class="text-slate-500 text-sm">No recent transactions.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PLANS -->
+    <div class="page" id="page-plans">
+      <div class="mb-6">
+        <h3 class="text-xl font-bold text-white mb-1">Investment Plans</h3>
+        <p class="text-slate-400 text-sm">Choose a plan and start earning daily profits</p>
+      </div>
+
+      <!-- Calculator -->
+      <div class="card mb-6">
+        <h4 class="font-semibold text-white mb-4">💡 Profit Calculator</h4>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="text-sm text-slate-400 block mb-1">Investment Amount (PKR)</label>
+            <input type="number" id="calc-amount" placeholder="e.g. 10000" oninput="calcProfit()">
+          </div>
+          <div>
+            <label class="text-sm text-slate-400 block mb-1">Select Plan</label>
+            <select id="calc-plan" onchange="calcProfit()">
+              <option value="">-- Select Plan --</option>
+            </select>
+          </div>
+          <div class="flex flex-col justify-end">
+            <div class="bg-dark-700 rounded-xl p-4">
+              <div class="grid grid-cols-3 gap-3 text-center">
+                <div><p class="text-xs text-slate-500">Daily</p><p class="text-gold-500 font-bold text-lg" id="calc-daily">0</p></div>
+                <div><p class="text-xs text-slate-500">Total</p><p class="text-green-400 font-bold text-lg" id="calc-total">0</p></div>
+                <div><p class="text-xs text-slate-500">Return</p><p class="text-blue-400 font-bold text-lg" id="calc-return">0</p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5" id="plans-grid">
+        <p class="text-slate-500 col-span-4">Loading plans...</p>
+      </div>
+    </div>
+
+    <!-- DEPOSIT -->
+    <div class="page" id="page-deposit">
+      <div class="mb-6">
+        <h3 class="text-xl font-bold text-white mb-1">Deposit Funds</h3>
+        <p class="text-slate-400 text-sm">Add money to your account via JazzCash or Easypaisa</p>
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="card">
+          <h4 class="font-semibold text-white mb-4">📱 Payment Details</h4>
+          <div class="space-y-3" id="payment-details">
+            <div class="bg-dark-700 rounded-xl p-4 border border-yellow-900/30">
+              <div class="flex items-center gap-3 mb-3">
+                <div class="w-10 h-10 rounded-lg bg-red-900/30 flex items-center justify-center text-xl">📱</div>
+                <div>
+                  <p class="font-semibold text-white">JazzCash</p>
+                  <p class="text-xs text-slate-400">Mobile Payment</p>
+                </div>
+              </div>
+              <div class="text-sm space-y-1">
+                <div class="flex justify-between"><span class="text-slate-400">Number:</span><span class="text-white font-mono" id="jazzcash-num">Loading...</span></div>
+                <div class="flex justify-between"><span class="text-slate-400">Name:</span><span class="text-white" id="jazzcash-name">Loading...</span></div>
+              </div>
+            </div>
+            <div class="bg-dark-700 rounded-xl p-4 border border-green-900/30">
+              <div class="flex items-center gap-3 mb-3">
+                <div class="w-10 h-10 rounded-lg bg-green-900/30 flex items-center justify-center text-xl">💚</div>
+                <div>
+                  <p class="font-semibold text-white">Easypaisa</p>
+                  <p class="text-xs text-slate-400">Mobile Payment</p>
+                </div>
+              </div>
+              <div class="text-sm space-y-1">
+                <div class="flex justify-between"><span class="text-slate-400">Number:</span><span class="text-white font-mono" id="easypaisa-num">Loading...</span></div>
+                <div class="flex justify-between"><span class="text-slate-400">Name:</span><span class="text-white" id="easypaisa-name">Loading...</span></div>
+              </div>
+            </div>
+            <div class="bg-yellow-900/10 border border-yellow-800/30 rounded-xl p-3 text-xs text-yellow-400">
+              ⚠️ Send payment first, then fill the form below with your transaction ID and screenshot.
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <h4 class="font-semibold text-white mb-4">📋 Submit Deposit Request</h4>
+          <div class="space-y-4">
+            <div>
+              <label class="text-sm text-slate-400 block mb-1">Amount (PKR)</label>
+              <input type="number" id="dep-amount" placeholder="Minimum PKR 100">
+            </div>
+            <div>
+              <label class="text-sm text-slate-400 block mb-1">Payment Method</label>
+              <select id="dep-method">
+                <option value="jazzcash">JazzCash</option>
+                <option value="easypaisa">Easypaisa</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-sm text-slate-400 block mb-1">Transaction ID (TXN)</label>
+              <input type="text" id="dep-txnid" placeholder="e.g. TXN1234567890">
+            </div>
+            <div>
+              <label class="text-sm text-slate-400 block mb-1">Your Account Number</label>
+              <input type="text" id="dep-accno" placeholder="03001234567">
+            </div>
+            <div>
+              <label class="text-sm text-slate-400 block mb-1">Payment Screenshot</label>
+              <input type="file" id="dep-screenshot" accept="image/*" class="text-sm">
+            </div>
+            <button class="btn-gold w-full" onclick="submitDeposit()">Submit Deposit Request</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WITHDRAW -->
+    <div class="page" id="page-withdraw">
+      <div class="mb-6">
+        <h3 class="text-xl font-bold text-white mb-1">Withdraw Funds</h3>
+        <p class="text-slate-400 text-sm">Request a withdrawal to your JazzCash or Easypaisa account</p>
+      </div>
+      <div class="max-w-xl">
+        <div class="card mb-4">
+          <div class="flex items-center justify-between">
+            <span class="text-slate-400 text-sm">Available Balance</span>
+            <span class="text-gold-500 font-bold text-xl">PKR <span id="wit-balance">0</span></span>
+          </div>
+        </div>
+        <div class="card">
+          <h4 class="font-semibold text-white mb-4">💸 Withdrawal Request</h4>
+          <div class="space-y-4">
+            <div>
+              <label class="text-sm text-slate-400 block mb-1">Amount (PKR)</label>
+              <input type="number" id="wit-amount" placeholder="Minimum PKR 500">
+            </div>
+            <div>
+              <label class="text-sm text-slate-400 block mb-1">Payment Method</label>
+              <select id="wit-method">
+                <option value="jazzcash">JazzCash</option>
+                <option value="easypaisa">Easypaisa</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-sm text-slate-400 block mb-1">Your Account Number</label>
+              <input type="text" id="wit-accno" placeholder="03001234567">
+            </div>
+            <div>
+              <label class="text-sm text-slate-400 block mb-1">Account Title / Name</label>
+              <input type="text" id="wit-acctitle" placeholder="Your name on account">
+            </div>
+            <div class="bg-blue-900/10 border border-blue-800/20 rounded-xl p-3 text-xs text-blue-400">
+              ℹ️ Processing time: within 24 hours. Minimum withdrawal is PKR 500.
+            </div>
+            <button class="btn-gold w-full" onclick="submitWithdraw()">Request Withdrawal</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRANSACTIONS HISTORY -->
+    <div class="page" id="page-history">
+      <div class="mb-6 flex items-center justify-between">
+        <div>
+          <h3 class="text-xl font-bold text-white mb-1">Transaction History</h3>
+          <p class="text-slate-400 text-sm">All your deposits, withdrawals, investments & profits</p>
+        </div>
+        <select class="w-40" id="txn-filter" onchange="loadTransactions()">
+          <option value="">All Types</option>
+          <option value="deposit">Deposits</option>
+          <option value="withdrawal">Withdrawals</option>
+          <option value="investment">Investments</option>
+          <option value="profit">Profits</option>
+        </select>
+      </div>
+      <div class="card overflow-x-auto">
+        <table>
+          <thead><tr>
+            <th>Date</th><th>Type</th><th>Amount</th><th>Method</th><th>Status</th><th>Description</th>
+          </tr></thead>
+          <tbody id="txn-tbody">
+            <tr><td colspan="6" class="text-center text-slate-500 py-8">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ===== ADMIN PAGES ===== -->
+
+    <!-- ADMIN DASHBOARD -->
+    <div class="page" id="page-admin-dashboard">
+      <div class="mb-6">
+        <h3 class="text-xl font-bold text-white mb-1">Admin Overview</h3>
+        <p class="text-slate-400 text-sm">Platform statistics at a glance</p>
+      </div>
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="stat-card"><p class="text-xs text-slate-500 mb-1">Total Users</p><p class="text-2xl font-bold text-blue-400" id="a-users">-</p></div>
+        <div class="stat-card"><p class="text-xs text-slate-500 mb-1">Total Deposited</p><p class="text-2xl font-bold text-green-400">PKR <span id="a-deposits">-</span></p></div>
+        <div class="stat-card"><p class="text-xs text-slate-500 mb-1">Total Withdrawn</p><p class="text-2xl font-bold text-red-400">PKR <span id="a-withdrawals">-</span></p></div>
+        <div class="stat-card"><p class="text-xs text-slate-500 mb-1">Active Investments</p><p class="text-2xl font-bold text-gold-500">PKR <span id="a-investments">-</span></p></div>
+        <div class="stat-card"><p class="text-xs text-slate-500 mb-1">Profit Paid</p><p class="text-2xl font-bold text-purple-400">PKR <span id="a-profit">-</span></p></div>
+        <div class="stat-card"><p class="text-xs text-slate-500 mb-1">Pending Deposits</p><p class="text-2xl font-bold text-yellow-400" id="a-pdep">-</p></div>
+        <div class="stat-card"><p class="text-xs text-slate-500 mb-1">Pending Withdrawals</p><p class="text-2xl font-bold text-orange-400" id="a-pwit">-</p></div>
+        <div class="stat-card"><p class="text-xs text-slate-500 mb-1">Active Inv. Count</p><p class="text-2xl font-bold text-cyan-400" id="a-inv-count">-</p></div>
+      </div>
+    </div>
+
+    <!-- ADMIN USERS -->
+    <div class="page" id="page-admin-users">
+      <div class="mb-6 flex items-center justify-between flex-wrap gap-3">
+        <div><h3 class="text-xl font-bold text-white mb-1">User Management</h3><p class="text-slate-400 text-sm">View, manage and control all users</p></div>
+        <input type="text" id="user-search" placeholder="Search by name, email, phone..." class="w-64" oninput="searchUsers(this.value)">
+      </div>
+      <div class="card overflow-x-auto">
+        <table>
+          <thead><tr><th>User</th><th>Balance</th><th>Invested</th><th>Profit</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead>
+          <tbody id="admin-users-tbody"><tr><td colspan="7" class="text-center text-slate-500 py-8">Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ADMIN APPROVALS -->
+    <div class="page" id="page-admin-approvals">
+      <div class="mb-6"><h3 class="text-xl font-bold text-white mb-1">Pending Approvals</h3><p class="text-slate-400 text-sm">Approve or reject deposit and withdrawal requests</p></div>
+      <div class="flex gap-3 mb-4">
+        <button class="btn-ghost text-sm px-4 py-2" id="tab-dep-btn" onclick="loadApprovals('deposit')">💳 Deposits</button>
+        <button class="btn-ghost text-sm px-4 py-2" id="tab-wit-btn" onclick="loadApprovals('withdrawal')">💸 Withdrawals</button>
+      </div>
+      <div class="card overflow-x-auto">
+        <table>
+          <thead><tr><th>User</th><th>Amount</th><th>Method</th><th>TXN ID</th><th>Date</th><th>Screenshot</th><th>Actions</th></tr></thead>
+          <tbody id="approvals-tbody"><tr><td colspan="7" class="text-center text-slate-500 py-8">Select a tab above</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ADMIN PLANS -->
+    <div class="page" id="page-admin-plans">
+      <div class="mb-6 flex items-center justify-between">
+        <div><h3 class="text-xl font-bold text-white mb-1">Manage Plans</h3><p class="text-slate-400 text-sm">Create, edit and manage investment plans</p></div>
+        <button class="btn-gold px-5 py-2.5 text-sm" onclick="openPlanModal(null)">+ Add New Plan</button>
+      </div>
+      <div class="card overflow-x-auto">
+        <table>
+          <thead><tr><th>Plan</th><th>Min Invest</th><th>Max Invest</th><th>Daily ROI</th><th>Duration</th><th>Total ROI</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="admin-plans-tbody"><tr><td colspan="8" class="text-center text-slate-500 py-8">Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ADMIN SETTINGS -->
+    <div class="page" id="page-admin-settings">
+      <div class="mb-6"><h3 class="text-xl font-bold text-white mb-1">Platform Settings</h3><p class="text-slate-400 text-sm">Update payment details and platform configuration</p></div>
+      <div class="max-w-xl">
+        <div class="card">
+          <h4 class="font-semibold text-white mb-5">📱 Payment Account Details</h4>
+          <div class="space-y-4">
+            <div class="bg-dark-700 rounded-xl p-4">
+              <p class="text-sm font-semibold text-red-400 mb-3">JazzCash</p>
+              <div class="space-y-3">
+                <div><label class="text-xs text-slate-400 block mb-1">Account Number</label><input type="text" id="s-jazzcash-num" placeholder="03001234567"></div>
+                <div><label class="text-xs text-slate-400 block mb-1">Account Name</label><input type="text" id="s-jazzcash-name" placeholder="Account title"></div>
+              </div>
+            </div>
+            <div class="bg-dark-700 rounded-xl p-4">
+              <p class="text-sm font-semibold text-green-400 mb-3">Easypaisa</p>
+              <div class="space-y-3">
+                <div><label class="text-xs text-slate-400 block mb-1">Account Number</label><input type="text" id="s-easypaisa-num" placeholder="03001234567"></div>
+                <div><label class="text-xs text-slate-400 block mb-1">Account Name</label><input type="text" id="s-easypaisa-name" placeholder="Account title"></div>
+              </div>
+            </div>
+            <div>
+              <label class="text-xs text-slate-400 block mb-1">Minimum Withdrawal (PKR)</label>
+              <input type="number" id="s-min-wit" placeholder="500">
+            </div>
+            <button class="btn-gold w-full" onclick="saveSettings()">Save Settings</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end main-content -->
+</div><!-- end app-section -->
+
+<!-- ===== MODALS ===== -->
+
+<!-- Invest Modal -->
+<div class="modal-bg" id="invest-modal">
+  <div class="modal-box">
+    <h3 class="text-xl font-bold text-white mb-1" id="invest-modal-title">Invest Now</h3>
+    <p class="text-slate-400 text-sm mb-5" id="invest-modal-sub">Enter amount to invest</p>
+    <div class="space-y-4">
+      <div><label class="text-sm text-slate-400 block mb-1">Amount (PKR)</label><input type="number" id="invest-amount" placeholder="Enter amount" oninput="updateInvestCalc()"></div>
+      <div class="bg-dark-700 rounded-xl p-4">
+        <div class="grid grid-cols-3 gap-3 text-center text-sm">
+          <div><p class="text-slate-500 text-xs">Daily Profit</p><p class="text-gold-500 font-bold" id="im-daily">0</p></div>
+          <div><p class="text-slate-500 text-xs">Total Profit</p><p class="text-green-400 font-bold" id="im-profit">0</p></div>
+          <div><p class="text-slate-500 text-xs">Final Return</p><p class="text-blue-400 font-bold" id="im-return">0</p></div>
+        </div>
+      </div>
+      <p class="text-xs text-slate-500">Your balance: PKR <span id="im-balance">0</span></p>
+    </div>
+    <div class="flex gap-3 mt-6">
+      <button class="btn-ghost flex-1" onclick="closeModal('invest-modal')">Cancel</button>
+      <button class="btn-gold flex-1" onclick="confirmInvest()">Confirm Investment</button>
+    </div>
+  </div>
+</div>
+
+<!-- Balance Adjust Modal -->
+<div class="modal-bg" id="balance-modal">
+  <div class="modal-box">
+    <h3 class="text-xl font-bold text-white mb-1">Adjust Balance</h3>
+    <p class="text-slate-400 text-sm mb-5">Manually add or deduct user balance</p>
+    <input type="hidden" id="bal-user-id">
+    <div class="space-y-4">
+      <div class="bg-dark-700 rounded-xl p-3 text-sm"><span class="text-slate-400">User: </span><span class="text-white font-semibold" id="bal-user-name">-</span> &nbsp;|&nbsp; <span class="text-slate-400">Balance: </span><span class="text-gold-500 font-semibold">PKR <span id="bal-current">0</span></span></div>
+      <div><label class="text-sm text-slate-400 block mb-1">Action</label><select id="bal-action"><option value="add">Add (Credit)</option><option value="deduct">Deduct (Debit)</option></select></div>
+      <div><label class="text-sm text-slate-400 block mb-1">Amount (PKR)</label><input type="number" id="bal-amount" placeholder="Enter amount"></div>
+      <div><label class="text-sm text-slate-400 block mb-1">Reason</label><input type="text" id="bal-reason" placeholder="e.g. Bonus credit, referral reward..."></div>
+    </div>
+    <div class="flex gap-3 mt-6">
+      <button class="btn-ghost flex-1" onclick="closeModal('balance-modal')">Cancel</button>
+      <button class="btn-gold flex-1" onclick="applyBalance()">Apply</button>
+    </div>
+  </div>
+</div>
+
+<!-- Plan Modal -->
+<div class="modal-bg" id="plan-modal">
+  <div class="modal-box">
+    <h3 class="text-xl font-bold text-white mb-5" id="plan-modal-title">Add Plan</h3>
+    <input type="hidden" id="plan-id">
+    <div class="space-y-4">
+      <div class="grid grid-cols-2 gap-3">
+        <div class="col-span-2"><label class="text-sm text-slate-400 block mb-1">Plan Name</label><input type="text" id="pl-name" placeholder="e.g. Gold Plan"></div>
+        <div class="col-span-2"><label class="text-sm text-slate-400 block mb-1">Description</label><input type="text" id="pl-desc" placeholder="Short description"></div>
+        <div><label class="text-sm text-slate-400 block mb-1">Min Amount (PKR)</label><input type="number" id="pl-min" placeholder="1000"></div>
+        <div><label class="text-sm text-slate-400 block mb-1">Max Amount (PKR)</label><input type="number" id="pl-max" placeholder="100000"></div>
+        <div><label class="text-sm text-slate-400 block mb-1">Daily ROI (%)</label><input type="number" id="pl-roi" step="0.01" placeholder="2.5"></div>
+        <div><label class="text-sm text-slate-400 block mb-1">Duration (Days)</label><input type="number" id="pl-days" placeholder="30"></div>
+        <div><label class="text-sm text-slate-400 block mb-1">Icon (Emoji)</label><input type="text" id="pl-icon" placeholder="💰"></div>
+        <div><label class="text-sm text-slate-400 block mb-1">Color (Hex)</label><input type="color" id="pl-color" value="#f59e0b" style="height:42px;padding:4px"></div>
+      </div>
+    </div>
+    <div class="flex gap-3 mt-6">
+      <button class="btn-ghost flex-1" onclick="closeModal('plan-modal')">Cancel</button>
+      <button class="btn-gold flex-1" onclick="savePlan()">Save Plan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Screenshot Modal -->
+<div class="modal-bg" id="screenshot-modal">
+  <div class="modal-box text-center">
+    <h3 class="text-lg font-bold text-white mb-4">Payment Screenshot</h3>
+    <img id="screenshot-img" src="" alt="Screenshot" class="max-w-full rounded-xl mb-4">
+    <button class="btn-ghost" onclick="closeModal('screenshot-modal')">Close</button>
+  </div>
+</div>
+
+<script>
+const API = 'http://localhost:5000/api';
+let token = localStorage.getItem('gp_token');
+let currentUser = null;
+let selectedPlanId = null;
+let selectedPlan = null;
+let allPlans = [];
+
+// ===== UTILS =====
+function fmt(n) { return parseFloat(n || 0).toLocaleString('en-PK'); }
+function showToast(msg, type = 'info') {
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(l => { if (l.textContent.toLowerCase().includes(name.replace('-', ' ').replace('admin ', ''))) l.classList.add('active'); });
+  const titles = { dashboard: 'Dashboard', plans: 'Investment Plans', deposit: 'Deposit Funds', withdraw: 'Withdraw Funds', history: 'Transaction History', 'admin-dashboard': 'Admin Overview', 'admin-users': 'Users', 'admin-approvals': 'Approvals', 'admin-plans': 'Manage Plans', 'admin-settings': 'Settings' };
+  document.getElementById('page-title').textContent = titles[name] || name;
+  if (name === 'dashboard') loadDashboard();
+  if (name === 'plans') loadPlans();
+  if (name === 'deposit') loadPaymentDetails();
+  if (name === 'withdraw') { document.getElementById('wit-balance').textContent = fmt(currentUser?.balance); }
+  if (name === 'history') loadTransactions();
+  if (name === 'admin-dashboard') loadAdminStats();
+  if (name === 'admin-users') loadAdminUsers();
+  if (name === 'admin-approvals') loadApprovals('deposit');
+  if (name === 'admin-plans') loadAdminPlans();
+  if (name === 'admin-settings') loadSettings();
+}
+
+async function apiFetch(url, options = {}) {
+  const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  if (options.body instanceof FormData) delete headers['Content-Type'];
+  const res = await fetch(API + url, { ...options, headers });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || 'Request failed');
+  return data;
+}
+
+// ===== AUTH =====
+function showAuth(page) {
+  document.getElementById('login-page').style.display = 'none';
+  document.getElementById('signup-page').style.display = 'none';
+  document.getElementById('otp-page').style.display = 'none';
+  document.getElementById(page + '-page').style.display = 'flex';
+}
+
+async function handleLogin() {
+  try {
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+    const data = await apiFetch('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) });
+    token = data.token;
+    localStorage.setItem('gp_token', token);
+    await initApp();
+    showToast('Welcome back!', 'success');
+  } catch (err) {
+    if (err.message.includes('verify')) showAuth('otp');
+    showToast(err.message, 'error');
+  }
+}
+
+let pendingEmail = '';
+async function handleSignup() {
+  try {
+    const name = document.getElementById('signup-name').value;
+    const email = document.getElementById('signup-email').value;
+    const phone = document.getElementById('signup-phone').value;
+    const password = document.getElementById('signup-password').value;
+    await apiFetch('/auth/signup', { method: 'POST', body: JSON.stringify({ name, email, phone, password }) });
+    pendingEmail = email;
+    showAuth('otp');
+    showToast('OTP sent to your email!', 'success');
+  } catch (err) { showToast(err.message, 'error'); }
+}
+
+async function handleVerifyOTP() {
+  try {
+    const otp = document.getElementById('otp-input').value;
+    const email = pendingEmail || document.getElementById('login-email').value;
+    const data = await apiFetch('/auth/verify-otp', { method: 'POST', body: JSON.stringify({ email, otp }) });
+    token = data.token;
+    localStorage.setItem('gp_token', token);
+    await initApp();
+    showToast('Email verified! Welcome!', 'success');
+  } catch (err) { showToast(err.message, 'error'); }
+}
+
+async function handleResendOTP() {
+  try {
+    const email = pendingEmail || document.getElementById('login-email').value;
+    await apiFetch('/auth/resend-otp', { method: 'POST', body: JSON.stringify({ email }) });
+    showToast('New OTP sent!', 'info');
+  } catch (err) { showToast(err.message, 'error'); }
+}
+
+function handleLogout() {
+  localStorage.removeItem('gp_token');
+  token = null;
+  currentUser = null;
+  document.getElementById('app-section').style.display = 'none';
+  document.getElementById('auth-section').style.display = 'block';
+  showAuth('login');
+}
+
+async function initApp() {
+  try {
+    const data = await apiFetch('/auth/me');
+    currentUser = data.user;
+    document.getElementById('auth-section').style.display = 'none';
+    document.getElementById('app-section').style.display = 'block';
+    document.getElementById('sidebar-name').textContent = currentUser.name;
+    document.getElementById('user-avatar').textContent = currentUser.name[0].toUpperCase();
+    document.getElementById('topbar-balance').textContent = fmt(currentUser.balance);
+
+    if (currentUser.role === 'admin') {
+      document.getElementById('sidebar-role').textContent = 'Administrator';
+      document.getElementById('admin-nav').style.display = 'block';
+      showPage('admin-dashboard');
+    } else {
+      document.getElementById('sidebar-role').textContent = 'Investor';
+      showPage('dashboard');
+    }
+  } catch (err) {
+    localStorage.removeItem('gp_token');
+    token = null;
+  }
+}
+
+// ===== DASHBOARD =====
+async function loadDashboard() {
+  try {
+    const data = await apiFetch('/auth/me');
+    currentUser = data.user;
+    document.getElementById('dash-name').textContent = currentUser.name.split(' ')[0];
+    document.getElementById('d-balance').textContent = fmt(currentUser.balance);
+    document.getElementById('d-invested').textContent = fmt(currentUser.totalInvested);
+    document.getElementById('d-profit').textContent = fmt(currentUser.totalProfit);
+    document.getElementById('d-withdrawn').textContent = fmt(currentUser.totalWithdrawn);
+    document.getElementById('topbar-balance').textContent = fmt(currentUser.balance);
+
+    const inv = await apiFetch('/transactions/investments');
+    const active = inv.investments.filter(i => i.status === 'active');
+    const el = document.getElementById('active-investments-list');
+    if (active.length === 0) { el.innerHTML = '<p class="text-slate-500 text-sm">No active investments. <span class="text-gold-500 cursor-pointer" onclick="showPage(\'plans\')">Invest now →</span></p>'; }
+    else {
+      el.innerHTML = active.map(i => {
+        const pct = Math.min(100, (i.daysCompleted / i.durationDays) * 100).toFixed(0);
+        return `<div class="mb-4 bg-dark-700 rounded-xl p-4">
+          <div class="flex justify-between items-start mb-2">
+            <div><p class="font-semibold text-white text-sm">${i.planName}</p><p class="text-xs text-slate-400">PKR ${fmt(i.amount)}</p></div>
+            <div class="text-right"><p class="text-gold-500 font-bold text-sm">+PKR ${fmt(i.profitEarned)}</p><p class="text-xs text-slate-400">profit earned</p></div>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+          <div class="flex justify-between mt-1"><span class="text-xs text-slate-500">Day ${i.daysCompleted}/${i.durationDays}</span><span class="text-xs text-slate-500">${pct}% done</span></div>
+        </div>`;
+      }).join('');
+    }
+
+    const txns = await apiFetch('/transactions/my?limit=5');
+    const tel = document.getElementById('recent-txns-list');
+    if (txns.transactions.length === 0) { tel.innerHTML = '<p class="text-slate-500 text-sm">No transactions yet.</p>'; }
+    else {
+      tel.innerHTML = txns.transactions.map(t => {
+        const colors = { deposit: 'text-green-400', withdrawal: 'text-red-400', profit: 'text-gold-500', investment: 'text-blue-400', adjustment: 'text-purple-400' };
+        const prefix = ['deposit', 'profit'].includes(t.type) ? '+' : '-';
+        return `<div class="flex items-center justify-between py-2 border-b border-dark-600 last:border-0">
+          <div><p class="text-sm text-white capitalize">${t.type}</p><p class="text-xs text-slate-500">${new Date(t.createdAt).toLocaleDateString()}</p></div>
+          <span class="${colors[t.type] || 'text-white'} font-semibold text-sm">${prefix}PKR ${fmt(Math.abs(t.amount))}</span>
+        </div>`;
+      }).join('');
+    }
+  } catch (err) { showToast(err.message, 'error'); }
+}
+
+// ===== PLANS =====
+async function loadPlans() {
+  try {
+    const data = await apiFetch('/plans');
+    allPlans = data.plans;
+    const sel = document.getElementById('calc-plan');
+    sel.innerHTML = '<option value="">-- Select Plan --</option>' + allPlans.map(p => `<option value="${p._id}" data-roi="${p.dailyROI}" data-days="${p.durationDays}">${p.name} (${p.dailyROI}%/day)</option>`).join('');
+
+    const grid = document.getElementById('plans-grid');
+    if (allPlans.length === 0) { grid.innerHTML = '<p class="text-slate-500 col-span-4">No active plans available.</p>'; return; }
+    grid.innerHTML = allPlans.map(p => `
+      <div class="card relative overflow-hidden" style="border-color:${p.color}33">
+        <div class="absolute top-0 left-0 right-0 h-1" style="background:${p.color}"></div>
+        <div class="text-4xl mb-3">${p.icon || '💰'}</div>
+        <h4 class="font-bold text-white text-lg mb-1">${p.name}</h4>
+        <p class="text-slate-400 text-xs mb-4">${p.description || ''}</p>
+        <div class="space-y-2 mb-5 text-sm">
+          <div class="flex justify-between"><span class="text-slate-400">Daily ROI</span><span class="font-bold" style="color:${p.color}">${p.dailyROI}%</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">Duration</span><span class="text-white">${p.durationDays} days</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">Total ROI</span><span class="text-green-400 font-semibold">${p.totalROI}%</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">Min / Max</span><span class="text-white">${fmt(p.minAmount)} / ${fmt(p.maxAmount)}</span></div>
+        </div>
+        <button class="btn-gold w-full text-sm" onclick="openInvestModal('${p._id}')">Invest Now</button>
+      </div>
+    `).join('');
+  } catch (err) { showToast(err.message, 'error'); }
+}
+
+function calcProfit() {
+  const amount = parseFloat(document.getElementById('calc-amount').value) || 0;
+  const sel = document.getElementById('calc-plan');
+  const opt = sel.options[sel.selectedIndex];
+  const roi = parseFloat(opt?.dataset?.roi) || 0;
+  const days = parseInt(opt?.dataset?.days) || 0;
+  const daily = (amount * roi / 100);
+  const total = daily * days;
+  document.getElementById('calc-daily').textContent = 'PKR ' + fmt(daily);
+  document.getElementById('calc-total').textContent = 'PKR ' + fmt(total);
+  document.getElementById('calc-return').textContent = 'PKR ' + fmt(amount + total);
+}
+
+function openInvestModal(planId) {
+  selectedPlan = allPlans.find(p => p._id === planId);
+  selectedPlanId = planId;
+  document.getElementById('invest-modal-title').textContent = `Invest in ${selectedPlan.name}`;
+  document.getElementById('invest-modal-sub').textContent = `Daily ${selectedPlan.dailyROI}% for ${selectedPlan.durationDays} days | Min PKR ${fmt(selectedPlan.minAmount)}`;
+  document.getElementById('im-balance').textContent = fmt(currentUser?.balance);
+  document.getElementById('invest-amount').value = '';
+  document.getElementById('im-daily').textContent = '0';
+  document.getElementById('im-profit').textContent = '0';
+  document.getElementById('im-return').textContent = '0';
+  openModal('invest-modal');
+}
+
+function updateInvestCalc() {
+  const amt = parseFloat(document.getElementById('invest-amount').value) || 0;
+  if (!selectedPlan) return;
+  const daily = amt * selectedPlan.dailyROI / 100;
+  const total = daily * selectedPlan.durationDays;
+  document.getElementById('im-daily').textContent = 'PKR ' + fmt(daily);
+  document.getElementById('im-profit').textContent = 'PKR ' + fmt(total);
+  document.getElementById('im-return').textContent = 'PKR ' + fmt(amt + total);
+}
+
+async function confirmInvest() {
+  try {
+    const amount = document.getElementById('invest-amount').value;
+    const data = await apiFetch('/transactions/invest', { method: 'POST', body: JSON.stringify({ planId: selectedPlanId, amount }) });
+    closeModal('invest-modal');
+    currentUser.balance -= parseFloat(amount);
+    document.getElementById('topbar-balance').textContent = fmt(currentUser.balance);
+    showToast('Investment started! Daily profit will be credited at midnight.', 'success');
+    showPage('dashboard');
+  } catch (err) { showToast(err.message, 'error'); }
+}
+
+// ===== DEPOSIT =====
+async function loadPaymentDetails() {
+  try {
+    const data = await apiFetch('/admin/settings');
+    const s = data.settings;
+    document.getElementById('jazzcash-num').textContent = s.jazzcash_number || '-';
+    document.getElementById('jazzcash-name').textContent = s.jazzcash_name || '-';
+    document.getElementById('easypaisa-num').textContent = s.easypaisa_number || '-';
+    document.getElementById('easypaisa-name').textContent = s.easypaisa_name || '-';
+  } catch (err) {}
+}
+
+async function submitDeposit() {
+  try {
+    const formData = new FormData();
+    formData.append('amount', document.getElementById('dep-amount').value);
+    formData.append('paymentMethod', document.getElementById('dep-method').value);
+    formData.append('transactionId', document.getElementById('dep-txnid').value);
+    formData.append('accountNumber', document.getElementById('dep-accno').value);
+    const file = document.getElementById('dep-screenshot').files[0];
+    if (file) formData.append('screenshot', file);
+
+    const res = await fetch(API + '/transactions/deposit', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` },
+      body: formData
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message);
+    showToast('Deposit request submitted! Pending approval.', 'success');
+    ['dep-amount', 'dep-txnid', 'dep-accno'].forEach(id => document.getElementById(id).value = '');
+  } catch (err) { showToast(err.message, 'error'); }
+}
+
+// ===== WITHDRAWAL =====
+async function submitWithdraw() {
+  try {
+    const data = await apiFetch('/transactions/withdraw', {
+      method: 'POST',
+      body: JSON.stringify({
+        amount: document.getElementById('wit-amount').value,
+        paymentMethod: document.getElementById('wit-method').value,
+        accountNumber: document.getElementById('wit-accno').value,
+        accountTitle: document.getElementById('wit-acctitle').value
+      })
+    });
+    currentUser.balance -= parseFloat(document.getElementById('wit-amount').value);
+    document.getElementById('topbar-balance').textContent = fmt(currentUser.balance);
+    document.getElementById('wit-balance').textContent = fmt(currentUser.balance);
+    showToast('Withdrawal request submitted! Processing within 24 hours.', 'success');
+    ['wit-amount', 'wit-accno', 'wit-acctitle'].forEach(id => document.getElementById(id).value = '');
+  } catch (err) { showToast(err.message, 'error'); }
+}
+
+// ===== TRANSACTIONS =====
+async function loadTransactions() {
+  try {
+    const type = document.getElementById('txn-filter').value;
+    const url = '/transactions/my?limit=50' + (type ? `&type=${type}` : '');
+    const data = await apiFetch(url);
+    const tbody = document.getElementById('txn-tbody');
+    if (data.transactions.length === 0) { tbody.innerHTML = '<tr><td colspan="6" class="text-center text-slate-500 py-8">No transactions found.</td></tr>'; return; }
+    const badges = { pending: 'badge-pending', approved: 'badge-success', rejected: 'badge-rejected', completed: 'badge-success' };
+    const typeColors = { deposit: 'text-green-400', withdrawal: 'text-red-400', profit: 'text-gold-500', investment: 'text-blue-400', adjustment: 'text-purple-400' };
+    tbody.innerHTML = data.transactions.map(t => `
+      <tr>
+        <td>${new Date(t.createdAt).toLocaleDateString('en-PK')}</td>
+        <td><span class="capitalize ${typeColors[t.type] || ''}">${t.type}</span></td>
+        <td class="font-semibold">${['deposit', 'profit'].includes(t.type) ? '+' : '-'}PKR ${fmt(Math.abs(t.amount))}</td>
+        <td class="capitalize">${t.paymentMethod || '-'}</td>
+        <td><span class="${badges[t.status] || 'badge-pending'}">${t.status}</span></td>
+        <td class="text-slate-400 text-xs">${t.description || '-'}</td>
+      </tr>
+    `).join('');
+  } catch (err) { showToast(err.message, 'error'); }
+}
+
+// ===== ADMIN STATS =====
+async function loadAdminStats() {
+  try {
+    const data = await apiFetch('/admin/stats');
+    const s = data.stats;
+    document.getElementById('a-users').textContent = s.totalUsers;
+    document.getElementById('a-deposits').textContent = fmt(s.totalDeposits);
+    document.getElementById('a-withdrawals').textContent = fmt(s.totalWithdrawals);
+    document.getElementById('a-investments').textContent = fmt(s.activeInvestmentsAmount);
+    document.getElementById('a-profit').textContent = fmt(s.totalProfitPaid);
+    document.getElementById('a-pdep').textContent = s.pendingDeposits;
+    document.getElementById('a-pwit').textContent = s.pendingWithdrawals;
+    document.getElementById('a-inv-count').textContent = s.activeInvestmentsCount;
+  } catch (err) { showToast(err.message, 'error'); }
+}
+
+// ===== ADMIN USERS =====
+async function loadAdminUsers(search = '') {
+  try {
+    const url = '/admin/users?limit=50' + (search ? `&search=${search}` : '');
+    const data = await apiFetch(url);
+    const tbody = document.getElementById('admin-users-tbody');
+    if (data.users.length === 0) { tbody.innerHTML = '<tr><td colspan="7" class="text-center text-slate-500 py-8">No users found.</td></tr>'; return; }
+    tbody.innerHTML = data.users.map(u => `
+      <tr>
+        <td><div><p class="font-semibold text-white text-sm">${u.name}</p><p class="text-xs text-slate-400">${u.email}</p><p class="text-xs text-slate-500">${u.phone}</p></div></td>
+        <td class="text-gold-500 font-semibold">PKR ${fmt(u.balance)}</td>
+        <td class="text-blue-400">PKR ${fmt(u.totalInvested)}</td>
+        <td class="text-green-400">PKR ${fmt(u.totalProfit)}</td>
+        <td><span class="${u.isBlocked ? 'badge-rejected' : 'badge-success'}">${u.isBlocked ? 'Blocked' : 'Active'}</span></td>
+        <td class="text-slate-400 text-xs">${new Date(u.createdAt).toLocaleDateString()}</td>
+        <td>
+          <div class="flex gap-2 flex-wrap">
+            <button class="btn-ghost text-xs px-3 py-1.5" onclick="openBalanceModal('${u._id}','${u.name}',${u.balance})">${'⚖️ Balance'}</button>
+            <button class="btn-ghost text-xs px-3 py-1.5 ${u.isBlocked ? 'text-green-400' : 'text-red-400'}" onclick="toggleBlock('${u._id}',this)">${u.isBlocked ? '✅ Unblock' : '🚫 Block'}</button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  } catch (err) { showToast(err.message, 'error'); }
+}
+let searchTimer;
+function searchUsers(val) { clearTimeout(searchTimer); searchTimer = setTimeout(() => loadAdminUsers(val), 400); }
+
+async function toggleBlock(userId, btn) {
+  try {
+    const data = await apiFetch(`/admin/users/${userId}/block`, { method: 'PATCH' });
+    showToast(data.message, 'success');
+    loadAdminUsers();
+  } catch (err) { showToast(err.message, 'error'); }
+}
+
+function openBalanceModal(id, name, balance) {
+  document.getElementById('bal-user-id').value = id;
+  document.getElementById('bal-user-name').textContent = name;
+  document.getElementById('bal-current').textContent = fmt(balance);
+  document.getElementById('bal-amount').value = '';
+  document.getElementById('bal-reason').value = '';
+  openModal('balance-modal');
+}
+
+async function applyBalance() {
+  try {
+    const id = document.getElementById('bal-user-id').value;
+    const action = document.getElementById('bal-action').value;
+    const amount = document.getElementById('bal-amount').value;
+    const reason = document.getElementById('bal-reason').value;
+    const data = await apiFetch(`/admin/users/${id}/balance`, { method: 'PATCH', body: JSON.stringify({ action, amount, reason }) });
+    closeModal('balance-modal');
+    showToast(data.message, 'success');
+    loadAdminUsers();
+  } catch (err) { showToast(err.message, 'error'); }
+}
+
+// ===== ADMIN APPROVALS =====
+async function loadApprovals(type) {
+  try {
+    document.getElementById('tab-dep-btn').className = `btn-ghost text-sm px-4 py-2 ${type === 'deposit' ? 'border-gold-500 text-gold-500' : ''}`;
+    document.getElementById('tab-wit-btn').className = `btn-ghost text-sm px-4 py-2 ${type === 'withdrawal' ? 'border-gold-500 text-gold-500' : ''}`;
+    const data = await apiFetch(`/transactions/admin/all?type=${type}&status=pending`);
+    const tbody = document.getElementById('approvals-tbody');
+    if (data.transactions.length === 0) { tbody.innerHTML = '<tr><td colspan="7" class="text-center text-slate-500 py-8">No pending requests.</td></tr>'; return; }
+    tbody.innerHTML = data.transactions.map(t => `
+      <tr>
+        <td><p class="text-white text-sm font-semibold">${t.user?.name || '-'}</p><p class="text-xs text-slate-400">${t.user?.phone || ''}</p></td>
+        <td class="font-bold text-gold-500">PKR ${fmt(t.amount)}</td>
+        <td class="capitalize">${t.paymentMethod}</td>
+        <td class="font-mono text-xs">${t.transactionId || '-'}</td>
+        <td class="text-xs text-slate-400">${new Date(t.createdAt).toLocaleDateString()}</td>
+        <td>${t.screenshotUrl ? `<button class="btn-ghost text-xs px-2 py-1" onclick="viewScreenshot('${t.screenshotUrl}')">📷 View</button>` : '-'}</td>
+        <td>
+          <div class="flex gap-2">
+            <button class="btn-gold text-xs px-3 py-1.5" onclick="reviewTxn('${t._id}','approve','${type}')">✅ Approve</button>
+            <button class="btn-ghost text-xs px-3 py-1.5 text-red-400" onclick="reviewTxn('${t._id}','reject','${type}')">❌ Reject</button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  } catch (err) { showToast(err.message, 'error'); }
+}
+
+async function reviewTxn(id, action, type) {
+  try {
+    const data = await apiFetch(`/transactions/admin/${id}/review`, { method: 'PATCH', body: JSON.stringify({ action, adminNote: '' }) });
+    showToast(data.message, 'success');
+    loadApprovals(type);
+    loadAdminStats();
+  } catch (err) { showToast(err.message, 'error'); }
+}
+
+function viewScreenshot(url) {
+  document.getElementById('screenshot-img').src = 'http://localhost:5000' + url;
+  openModal('screenshot-modal');
+}
+
+// ===== ADMIN PLANS =====
+async function loadAdminPlans() {
+  try {
+    const data = await apiFetch('/plans/all');
+    const tbody = document.getElementById('admin-plans-tbody');
+    if (data.plans.length === 0) { tbody.innerHTML = '<tr><td colspan="8" class="text-center text-slate-500 py-8">No plans.</td></tr>'; return; }
+    tbody.innerHTML = data.plans.map(p => `
+      <tr>
+        <td><div class="flex items-center gap-2"><span class="text-2xl">${p.icon}</span><span class="font-semibold text-white">${p.name}</span></div></td>
+        <td>PKR ${fmt(p.minAmount)}</td>
+        <td>PKR ${fmt(p.maxAmount)}</td>
+        <td class="text-gold-500 font-semibold">${p.dailyROI}%</td>
+        <td>${p.durationDays} days</td>
+        <td class="text-green-400 font-semibold">${p.totalROI}%</td>
+        <td><span class="${p.isActive ? 'badge-success' : 'badge-rejected'}">${p.isActive ? 'Active' : 'Inactive'}</span></td>
+        <td>
+          <div class="flex gap-2">
+            <button class="btn-ghost text-xs px-3 py-1.5" onclick="openPlanModal('${p._id}')">✏️ Edit</button>
+            <button class="btn-ghost text-xs px-3 py-1.5 text-red-400" onclick="deactivatePlan('${p._id}')">🗑️</button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  } catch (err) { showToast(err.message, 'error'); }
+}
+
+function openPlanModal(id) {
+  if (id) {
+    const pl = (window._adminPlansCache || []).find(p => p._id === id);
+    document.getElementById('plan-modal-title').textContent = 'Edit Plan';
+    document.getElementById('plan-id').value = id;
+    if (pl) {
+      document.getElementById('pl-name').value = pl.name;
+      document.getElementById('pl-desc').value = pl.description || '';
+      document.getElementById('pl-min').value = pl.minAmount;
+      document.getElementById('pl-max').value = pl.maxAmount;
+      document.getElementById('pl-roi').value = pl.dailyROI;
+      document.getElementById('pl-days').value = pl.durationDays;
+      document.getElementById('pl-icon').value = pl.icon || '';
+      document.getElementById('pl-color').value = pl.color || '#f59e0b';
+    }
+  } else {
+    document.getElementById('plan-modal-title').textContent = 'Add New Plan';
+    document.getElementById('plan-id').value = '';
+    ['pl-name', 'pl-desc', 'pl-min', 'pl-max', 'pl-roi', 'pl-days', 'pl-icon'].forEach(id => document.getElementById(id).value = '');
+  }
+  openModal('plan-modal');
+}
+
+async function savePlan() {
+  try {
+    const id = document.getElementById('plan-id').value;
+    const body = {
+      name: document.getElementById('pl-name').value,
+      description: document.getElementById('pl-desc').value,
+      minAmount: parseFloat(document.getElementById('pl-min').value),
+      maxAmount: parseFloat(document.getElementById('pl-max').value),
+      dailyROI: parseFloat(document.getElementById('pl-roi').value),
+      durationDays: parseInt(document.getElementById('pl-days').value),
+      icon: document.getElementById('pl-icon').value,
+      color: document.getElementById('pl-color').value
+    };
+    if (id) {
+      await apiFetch(`/plans/${id}`, { method: 'PUT', body: JSON.stringify(body) });
+      showToast('Plan updated!', 'success');
+    } else {
+      await apiFetch('/plans', { method: 'POST', body: JSON.stringify(body) });
+      showToast('Plan created!', 'success');
+    }
+    closeModal('plan-modal');
+    loadAdminPlans();
+  } catch (err) { showToast(err.message, 'error'); }
+}
+
+async function deactivatePlan(id) {
+  if (!confirm('Deactivate this plan?')) return;
+  try {
+    await apiFetch(`/plans/${id}`, { method: 'DELETE' });
+    showToast('Plan deactivated.', 'success');
+    loadAdminPlans();
+  } catch (err) { showToast(err.message, 'error'); }
+}
+
+// ===== ADMIN SETTINGS =====
+async function loadSettings() {
+  try {
+    const data = await apiFetch('/admin/settings');
+    const s = data.settings;
+    document.getElementById('s-jazzcash-num').value = s.jazzcash_number || '';
+    document.getElementById('s-jazzcash-name').value = s.jazzcash_name || '';
+    document.getElementById('s-easypaisa-num').value = s.easypaisa_number || '';
+    document.getElementById('s-easypaisa-name').value = s.easypaisa_name || '';
+    document.getElementById('s-min-wit').value = s.min_withdrawal || 500;
+  } catch (err) {}
+}
+
+async function saveSettings() {
+  try {
+    await apiFetch('/admin/settings', {
+      method: 'PUT',
+      body: JSON.stringify({
+        jazzcash_number: document.getElementById('s-jazzcash-num').value,
+        jazzcash_name: document.getElementById('s-jazzcash-name').value,
+        easypaisa_number: document.getElementById('s-easypaisa-num').value,
+        easypaisa_name: document.getElementById('s-easypaisa-name').value,
+        min_withdrawal: parseFloat(document.getElementById('s-min-wit').value)
+      })
+    });
+    showToast('Settings saved!', 'success');
+  } catch (err) { showToast(err.message, 'error'); }
+}
+
+// ===== INIT =====
+document.addEventListener('click', e => {
+  if (e.target.classList.contains('modal-bg')) closeModal(e.target.id);
+});
+
+if (token) initApp();
+</script>
+</body>
+</html>
